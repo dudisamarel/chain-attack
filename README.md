@@ -4,7 +4,9 @@ This script simulates a multi-stage attack chain in an Active Directory environm
 All actions are carefully logged and the report is securely exported to Pastebin.
 
 ### Attack Chain Diagram
-![chain-attack-diagram](chain-attack-diagram.png)
+<div align="center">
+<img src="chain-attack-diagram.png" width="500">
+</div>
 
 ### Example Output
 ```
@@ -42,10 +44,10 @@ All actions are carefully logged and the report is securely exported to Pastebin
 ```
 
 ### Evasion Techniques Used
-**Avoid Lockouts:** Checks bad password count before login attempts to prevent account lockouts.
-**Living off the Land:** Leverages built-in Windows tools and PowerShell cmdlets rather than external tools.
-**Stealth Communication:** Utilizes DNS tunneling for command and control, blending with normal network traffic.
-**Fileless Operation:** Uses PowerShell's in-memory execution capabilities to avoid writing files to disk.
+- **Avoid Lockouts:** Checks bad password count before login attempts to prevent account lockouts.
+- **Living off the Land:** Leverages built-in Windows tools and PowerShell cmdlets rather than external tools.
+- **Stealth Communication:** Utilizes DNS tunneling for command and control, blending with normal network traffic.
+- **Fileless Operation:** Uses PowerShell's in-memory execution capabilities to avoid writing files to disk.
 
 ## Resources
 - https://github.com/M0M3NTUM44/AMSIReflectionCrypt/
